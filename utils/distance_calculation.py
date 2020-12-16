@@ -4,7 +4,7 @@ from torch.nn import functional as F
 
 
 def compute_distance_matrix(input1, input2, metric='euclidean'):
-    """A wrapper function for computing distance matrix.
+    """
     Args:
         input1 (torch.Tensor): 2-D feature matrix.
         input2 (torch.Tensor): 2-D feature matrix.
@@ -12,12 +12,6 @@ def compute_distance_matrix(input1, input2, metric='euclidean'):
             Default is "euclidean".
     Returns:
         torch.Tensor: distance matrix.
-    Examples::
-       >>> from torchreid import metrics
-       >>> input1 = torch.rand(10, 2048)
-       >>> input2 = torch.rand(100, 2048)
-       >>> distmat = metrics.compute_distance_matrix(input1, input2)
-       >>> distmat.size() # (10, 100)
     """
     # check input
     assert isinstance(input1, torch.Tensor)
