@@ -27,7 +27,7 @@ def visualization(queries_imgs_paths, gallery_imgs_paths, distances, scale_perce
         # fig = px.imshow(result_image)
         # fig.show()
         cv2.imshow('Result', result_image)
-        save_dir = os.path.join("results_images", os.path.basename(query_path))
+        save_dir = os.path.join("results_images","prid_only_ep30",os.path.basename(query_path)) # :TODO hard code path need to rewrite
         cv2.imwrite(f"{save_dir}",result_image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
@@ -57,6 +57,6 @@ if  __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Inference ReId Net.')
     parser.add_argument('--data_path', type=str, default="test_data", help='path to test data')
     parser.add_argument('--batch_size', type=int, default=1, help='batch size')
-    parser.add_argument('--path_to_model', type=str, default="/home/alexander/Downloads/osnet_x1_0_market_256x128_amsgrad_ep150_stp60_lr0.0015_b64_fb10_softmax_labelsmooth_flip.pth", help='path to model ')
+    parser.add_argument('--path_to_model', type=str, default="/home/alexander/HSE_Stuff/Re-Id/log/model/prid_only_training_ep30.pth.tar-5", help='path to model ')
     args = parser.parse_args()
     inference(args)

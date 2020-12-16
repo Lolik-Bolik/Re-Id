@@ -6,7 +6,7 @@ def get_default_config():
 
     # model
     cfg.model = CN()
-    cfg.model.name = 'resnet50'
+    cfg.model.name = 'osnet_x1_0'
     cfg.model.pretrained = True # automatically load pretrained model weights if available
     cfg.model.load_weights = '' # path to model weights
     cfg.model.resume = '' # path to checkpoint for resume training
@@ -56,7 +56,7 @@ def get_default_config():
     cfg.train.optim = 'adam'
     cfg.train.lr = 0.0003
     cfg.train.weight_decay = 5e-4
-    cfg.train.max_epoch = 60
+    cfg.train.max_epoch = 30
     cfg.train.start_epoch = 0
     cfg.train.batch_size = 32
     cfg.train.fixbase_epoch = 0 # number of epochs to fix base layers
