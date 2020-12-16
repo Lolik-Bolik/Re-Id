@@ -6,6 +6,19 @@ from glob import glob
 import os
 import utils
 import numpy as np
+import cv2 
+
+def visualization(queries_imgs_paths, gallery_imgs_paths, distances):
+    for query_path, gallery_path, distance in zip(queries_imgs_paths, gallery_imgs_paths, distances):
+        print(query_path, gallery_path)
+        img1 = cv2.imread(query_path)
+        img2 = cv2.imread(gallery_path)
+        canvas = np.ones(img1.shape, dtype=np.uint8) * 255
+        result_image = cv2.hconcat([img1,canvas, img2])
+        cv2.imshow('Result', result_image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
 
 def inference(opts):
     extractor = FeatureExtractor(
@@ -23,7 +36,8 @@ def inference(opts):
     queries_features = extractor(queries_imgs_paths)
     dist_matrix = utils.compute_distance_matrix(gallery_features, queries_features)
     ind = np.argmin(dist_matrix.cpu().numpy(), axis=0)
-    print(np.take(target_ids, ind))
+    distances_values = np.take_along_axis(dist_matrix, ind[np.newaxis, :], axis=0)
+    visualization(queries_imgs_paths, np.take(gallery_imgs_paths, ind), distances_values)
 
 
 if  __name__ == "__main__":
