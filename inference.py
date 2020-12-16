@@ -27,6 +27,8 @@ def visualization(queries_imgs_paths, gallery_imgs_paths, distances, scale_perce
         # fig = px.imshow(result_image)
         # fig.show()
         cv2.imshow('Result', result_image)
+        save_dir = os.path.join("results_images", os.path.basename(query_path))
+        cv2.imwrite(f"{save_dir}",result_image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
