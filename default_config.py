@@ -56,7 +56,7 @@ def get_default_config():
     cfg.train.optim = 'adam'
     cfg.train.lr = 0.0003
     cfg.train.weight_decay = 5e-4
-    cfg.train.max_epoch = 30
+    cfg.train.max_epoch = 5
     cfg.train.start_epoch = 0
     cfg.train.batch_size = 32
     cfg.train.fixbase_epoch = 0 # number of epochs to fix base layers
@@ -96,7 +96,7 @@ def get_default_config():
     # test
     cfg.test = CN()
     cfg.test.batch_size = 100
-    cfg.test.dist_metric = 'euclidean' # distance metric, ['euclidean', 'cosine']
+    cfg.test.dist_metric = 'cosine' # distance metric, ['euclidean', 'cosine']
     cfg.test.normalize_feature = False # normalize feature vectors before computing distance
     cfg.test.ranks = [1, 5, 10, 20] # cmc ranks
     cfg.test.evaluate = False # test only
@@ -104,7 +104,7 @@ def get_default_config():
     cfg.test.start_eval = 0 # start to evaluate after a specific epoch
     cfg.test.rerank = False # use person re-ranking
     cfg.test.visrank = False # visualize ranked results (only available when cfg.test.evaluate=True)
-    cfg.test.visrank_topk = 10 # top-k ranks to visualize
+    cfg.test.visrank_topk = 5 # top-k ranks to visualize
 
     return cfg
 
