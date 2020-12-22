@@ -59,7 +59,15 @@ layout = html.Div(
         ),
         html.H2("Result"),
         html.Div(id='indicator-inference-result')
-    ]
+    ],
+    style={
+        "background-image": 'url(/assets/background_2.jpg)',
+        "background-repeat": "no-repeat",
+        "background-position": "center",
+        "background-size": "cover",
+        "position": "fixed",
+	    "min-height": "100%",
+	    "min-width": "100%",}
 )
 
 def clear_uploaded_folder():

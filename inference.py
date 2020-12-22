@@ -46,12 +46,11 @@ def inference(opts, is_plotly=False):
         device='cuda'
     )
     # extract feautures from gallery
-    test_data = torchvision.datasets.ImageFolder(root=os.path.join(opts.data_path, "gallery"))
+    test_data = torchvision.datasets.ImageFolder(root=os.path.join(opts.data_path, "custom_gallery"))
     gallery_imgs_paths, target_ids = zip(*test_data.imgs)
     gallery_features = extractor(list(gallery_imgs_paths))
     
     if is_plotly:
-        print('HEREEEEEEEEEEEEE')
         queries_imgs_paths = sorted(glob(os.path.join(UPLOAD_DIRECTORY,  "*")))
         queries_features = extractor(queries_imgs_paths)
         dist_matrix = utils.compute_distance_matrix(gallery_features, queries_features).cpu().numpy()
@@ -59,7 +58,6 @@ def inference(opts, is_plotly=False):
         distances_values = np.take_along_axis(dist_matrix, ind[np.newaxis, :], axis=0)[0]
         return visualization(queries_imgs_paths, np.take(gallery_imgs_paths, ind), distances_values, 150, is_plotly=True)
     else:
-        print('Not Here')
         # extract feature from queries images
         queries_imgs_paths = sorted(glob(os.path.join(opts.data_path, "queries", "*")))
         queries_features = extractor(queries_imgs_paths)
