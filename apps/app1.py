@@ -15,19 +15,13 @@ import cv2
 
 weigths = {"custom": "/home/alexander/HSE_Stuff/Re-Id/log/model/model.pth.tar-150",
 "pretrained": "/home/alexander/Downloads/osnet_x1_0_market_256x128_amsgrad_ep150_stp60_lr0.0015_b64_fb10_softmax_labelsmooth_flip.pth"}
+metrics = ["euclidean", "cosine"]
 UPLOAD_DIRECTORY = "./app_uploaded_files"
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
 
-# @server.route("/download/<path:path>")
-# def download(path):
-#     """Serve a file from the upload directory."""
-#     return send_from_directory(UPLOAD_DIRECTORY, path, as_attachment=True)
-
-# /home/alexander/Downloads/osnet_x1_0_market_256x128_amsgrad_ep150_stp60_lr0.0015_b64_fb10_softmax_labelsmooth_flip.pth
 class opts:
         data_path = "test_data"
-        path_to_model = "/home/alexander/HSE_Stuff/Re-Id/log/model/model.pth.tar-150"
         path_to_custom_model = "/home/alexander/HSE_Stuff/Re-Id/log/model/model.pth.tar-150"
         path_to_pretrained_model = "/home/alexander/Downloads/osnet_x1_0_market_256x128_amsgrad_ep150_stp60_lr0.0015_b64_fb10_softmax_labelsmooth_flip.pth"
         batch_size = 1
@@ -71,13 +65,23 @@ layout = html.Div(
                     dcc.Dropdown(
                         id="method-name",
                         options=[{"label": i, "value": i} for i in weigths],
-                        value="CuckooHashMap",
+                        value="custom",
                     ),
                 ],
                 style={"width": "48%", "display": "inline-block"},
             ),
-        html.Div(id='indicator-inference-result'),
-        html.Div(id='indicator-inference-result-2')
+        html.Div(
+            [
+                html.H6("Matching Metric"),
+                dcc.Dropdown(
+                    id="metric-name",
+                    options=[{"label": i, "value": i} for i in metrics],
+                    value="euclidean",
+                ),
+            ],
+            style={"width": "48%", "display": "inline-block"},
+        ),
+        html.Div(id='indicator-inference-result')
     ],
     style={
         "background-image": 'url(/assets/background_2.jpg)',
@@ -101,13 +105,13 @@ def clear_uploaded_folder():
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
-def save_file(weigths, name, content):
+def save_file(weigths,metric_name, name, content):
     """Decode and store a file uploaded with Plotly Dash."""
     clear_uploaded_folder()
     data = content.encode("utf8").split(b";base64,")[1]
     with open(os.path.join(UPLOAD_DIRECTORY, name), "wb") as fp:
         fp.write(base64.decodebytes(data))
-    fig = inference(opts, weigths, is_plotly=True)
+    fig = inference(opts, weigths, metric_name, is_plotly=True)
     return fig
 
 
@@ -129,12 +133,13 @@ def file_download_link(filename):
 
 @app.callback(
     Output("indicator-inference-result", "children"),
-    [Input("upload-data", "filename"), Input("upload-data", "contents"), Input("method-name", "value")],
+    [Input("upload-data", "filename"), Input("upload-data", "contents"), Input("method-name", "value"),
+    Input("metric-name", "value")],
 )
-def update_output(uploaded_filenames, uploaded_file_contents, weights):
+def update_output(uploaded_filenames, uploaded_file_contents, weights, metric_name):
     """Save uploaded files and regenerate the file list."""
-
+    print('Metric',metric_name)
     if uploaded_filenames is not None and uploaded_file_contents is not None:
         for name, data in zip(uploaded_filenames, uploaded_file_contents):
-            return dcc.Graph(figure=save_file(weights,name, data))
+            return dcc.Graph(figure=save_file(weights,metric_name,name, data))
 

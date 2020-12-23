@@ -11,7 +11,7 @@ import cv2
 
 UPLOAD_DIRECTORY = "./app_uploaded_files"
 
-def visualization(queries_imgs_paths, gallery_imgs_paths, distances, scale_percent,is_plotly=False):
+def visualization(queries_imgs_paths, gallery_imgs_paths, distances, scale_percent,metric_name, is_plotly=False):
     for query_path, gallery_path, distance in zip(queries_imgs_paths, gallery_imgs_paths, distances):
         print(query_path, gallery_path, distance)
         img1 = cv2.imread(query_path)
@@ -29,7 +29,10 @@ def visualization(queries_imgs_paths, gallery_imgs_paths, distances, scale_perce
         result_image = cv2.resize(result_image, new_dim, interpolation=cv2.INTER_CUBIC)
         if is_plotly:
             result_image = cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB)
-            fig = px.imshow(result_image, title=f"Euclidean distance: {round(distance, 2)}")
+            if metric_name == "cosine":
+                fig = px.imshow(result_image, title=f"Cosine distance: {distance}")
+            else:
+                fig = px.imshow(result_image, title=f"Euclidean distance: {distance}")
             return fig
         else:
             cv2.imshow('Result', result_image)
@@ -39,7 +42,7 @@ def visualization(queries_imgs_paths, gallery_imgs_paths, distances, scale_perce
             cv2.destroyAllWindows()
 
 
-def inference(opts,value,  is_plotly=False):
+def inference(opts, value,metric_name,  is_plotly=False):
     if value == "pretrained":
         extractor = FeatureExtractor(
             model_name='osnet_x1_0',
@@ -60,10 +63,13 @@ def inference(opts,value,  is_plotly=False):
     if is_plotly:
         queries_imgs_paths = sorted(glob(os.path.join(UPLOAD_DIRECTORY,  "*")))
         queries_features = extractor(queries_imgs_paths)
-        dist_matrix = utils.compute_distance_matrix(gallery_features, queries_features).cpu().numpy()
+        if metric_name == "cosine":
+            dist_matrix = utils.compute_distance_matrix(gallery_features, queries_features, metric="cosine").cpu().numpy()
+        else:
+            dist_matrix = utils.compute_distance_matrix(gallery_features, queries_features).cpu().numpy()
         ind = np.argmin(dist_matrix, axis=0)
         distances_values = np.take_along_axis(dist_matrix, ind[np.newaxis, :], axis=0)[0]
-        return visualization(queries_imgs_paths, np.take(gallery_imgs_paths, ind), distances_values, 150, is_plotly=True)
+        return visualization(queries_imgs_paths, np.take(gallery_imgs_paths, ind), distances_values, 150, metric_name, is_plotly=True)
     else:
         # extract feature from queries images
         queries_imgs_paths = sorted(glob(os.path.join(opts.data_path, "queries", "*")))
