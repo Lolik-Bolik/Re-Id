@@ -19,9 +19,9 @@ def visualization(queries_imgs_paths, gallery_imgs_paths, distances, scale_perce
         resize_dim = (img1.shape[1],img1.shape[0])
         img2 = cv2.resize(img2, resize_dim, interpolation=cv2.INTER_CUBIC)
         canvas = np.ones(img1.shape, dtype=np.uint8) * 255
-        canvas = cv2.putText(canvas, f"{round(distance, 2)}", 
-                            (15, 15) , cv2.FONT_HERSHEY_SIMPLEX,  
-                            0.5, (255, 0, 0) , 1, cv2.LINE_AA)
+        # canvas = cv2.putText(canvas, f"{round(distance, 2)}", 
+        #                     (15, 15) , cv2.FONT_HERSHEY_SIMPLEX,  
+        #                     0.5, (255, 0, 0) , 1, cv2.LINE_AA)
         result_image = cv2.hconcat([img1,canvas, img2])
         width = int(result_image.shape[1] * scale_percent / 100)
         height = int(result_image.shape[0] * scale_percent / 100)
@@ -29,7 +29,7 @@ def visualization(queries_imgs_paths, gallery_imgs_paths, distances, scale_perce
         result_image = cv2.resize(result_image, new_dim, interpolation=cv2.INTER_CUBIC)
         if is_plotly:
             result_image = cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB)
-            fig = px.imshow(result_image)
+            fig = px.imshow(result_image, title=f"Euclidean distance: {round(distance, 2)}")
             return fig
         else:
             cv2.imshow('Result', result_image)
@@ -39,12 +39,19 @@ def visualization(queries_imgs_paths, gallery_imgs_paths, distances, scale_perce
             cv2.destroyAllWindows()
 
 
-def inference(opts, is_plotly=False):
-    extractor = FeatureExtractor(
-        model_name='osnet_x1_0',
-        model_path=opts.path_to_model,
-        device='cuda'
-    )
+def inference(opts,value,  is_plotly=False):
+    if value == "pretrained":
+        extractor = FeatureExtractor(
+            model_name='osnet_x1_0',
+            model_path=opts.path_to_pretrained_model,
+            device='cuda'
+        )
+    else:
+        extractor = FeatureExtractor(
+            model_name='osnet_x1_0',
+            model_path=opts.path_to_custom_model,
+            device='cuda'
+        )
     # extract feautures from gallery
     test_data = torchvision.datasets.ImageFolder(root=os.path.join(opts.data_path, "custom_gallery"))
     gallery_imgs_paths, target_ids = zip(*test_data.imgs)
